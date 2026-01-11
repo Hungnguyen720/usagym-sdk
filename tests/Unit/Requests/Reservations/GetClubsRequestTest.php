@@ -19,13 +19,13 @@ describe('GetClubsRequest', function () {
     it('has correct endpoint with sanction ID', function () {
         $request = new GetClubsRequest(58025);
 
-        expect($request->resolveEndpoint())->toBe('/sanction/58025/reservations/club');
+        expect($request->resolveEndpoint())->toBe('/sanction/58025/reservations/clubs');
     });
 
     it('includes sanction ID in endpoint path', function () {
         $request = new GetClubsRequest(44444);
 
-        expect($request->resolveEndpoint())->toBe('/sanction/44444/reservations/club');
+        expect($request->resolveEndpoint())->toBe('/sanction/44444/reservations/clubs');
     });
 });
 

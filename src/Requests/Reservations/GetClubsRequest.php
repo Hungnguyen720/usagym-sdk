@@ -29,7 +29,7 @@ class GetClubsRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return "/sanction/{$this->sanctionId}/reservations/club";
+        return "/sanction/{$this->sanctionId}/reservations/clubs";
     }
 
     protected function defaultQuery(): array

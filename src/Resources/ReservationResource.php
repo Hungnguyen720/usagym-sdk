@@ -86,6 +86,12 @@ class ReservationResource
             new GetClubsRequest($this->sanctionId, $clubs)
         );
 
+        // Some sanction types (e.g., T&T meets) don't have club endpoints
+        // Return empty array for 404s instead of throwing an exception
+        if ($response->status() === 404) {
+            return [];
+        }
+
         return $response->dtoOrFail();
     }
 
