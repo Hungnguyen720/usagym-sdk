@@ -275,8 +275,16 @@ class UsaGymTestCommand extends Command
             $this->recordResult('Club Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch clubs: '.$e->getMessage());
         } catch (Throwable $e) {
-            $this->recordResult('Club Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
-            error('Failed to fetch clubs: '.$this->extractErrorMessage($e));
+            $errorMessage = $this->extractErrorMessage($e);
+
+            // Check if this is a 404 - endpoint may not be available for this sanction type
+            if (str_contains($errorMessage, 'HTTP 404')) {
+                $this->recordResult('Club Reservations', 'skip', 'Endpoint not available for this sanction type');
+                warning('Club reservations endpoint not available for this sanction type.');
+            } else {
+                $this->recordResult('Club Reservations', 'fail', 'Error: '.$errorMessage);
+                error('Failed to fetch clubs: '.$errorMessage);
+            }
         }
 
         $this->newLine();
@@ -290,13 +298,31 @@ class UsaGymTestCommand extends Command
                 message: 'Fetching athlete reservations...',
             );
 
-            $count = count($athletes);
-            $this->recordResult('Athlete Reservations', 'pass', "Retrieved {$count} athletes");
-            info("Athlete Reservations: {$count} athletes found");
+            $totalCount = count($athletes);
 
-            if ($count > 0) {
-                $sample = array_slice($athletes, 0, 5);
-                note('Sample athletes (first 5):');
+            // Count unique athletes by member ID
+            $uniqueMemberIds = array_unique(array_map(
+                fn ($athlete) => $athlete->memberId,
+                $athletes
+            ));
+            $uniqueCount = count($uniqueMemberIds);
+
+            $this->recordResult('Athlete Reservations', 'pass', "{$uniqueCount} unique athletes ({$totalCount} registrations)");
+            info("Athlete Reservations: {$uniqueCount} unique athletes ({$totalCount} registrations)");
+
+            if ($totalCount > 0) {
+                // Get unique athletes for sample display
+                $seen = [];
+                $uniqueAthletes = [];
+                foreach ($athletes as $athlete) {
+                    if (! isset($seen[$athlete->memberId])) {
+                        $seen[$athlete->memberId] = true;
+                        $uniqueAthletes[] = $athlete;
+                    }
+                }
+
+                $sample = array_slice($uniqueAthletes, 0, 5);
+                note('Sample athletes (first 5 unique):');
                 $tableData = [];
                 foreach ($sample as $athlete) {
                     $tableData[] = [
@@ -449,6 +475,7 @@ class UsaGymTestCommand extends Command
                 'pass' => '<fg=green>PASS</>',
                 'fail' => '<fg=red>FAIL</>',
                 'warn' => '<fg=yellow>WARN</>',
+                'skip' => '<fg=blue>SKIP</>',
                 default => $result['status'],
             };
 
