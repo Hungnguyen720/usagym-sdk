@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace AustinW\UsaGym\Laravel;
 
-use Illuminate\Support\ServiceProvider;
+use AustinW\UsaGym\Laravel\Console\UsaGymTestCommand;
 use AustinW\UsaGym\UsaGym;
+use Illuminate\Support\ServiceProvider;
 
 class UsaGymServiceProvider extends ServiceProvider
 {
@@ -37,6 +38,10 @@ class UsaGymServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/config/usagym.php' => config_path('usagym.php'),
             ], 'usagym-config');
+
+            $this->commands([
+                UsaGymTestCommand::class,
+            ]);
         }
     }
 
