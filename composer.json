@@ -10,7 +10,7 @@
     "api"
   ],
   "license": "MIT",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "support": {
     "issues": "https://github.com/austinw/usagym-sdk/issues",
     "source": "https://github.com/austinw/usagym-sdk"
@@ -22,7 +22,7 @@
     }
   ],
   "require": {
-    "php": "^8.1",
+    "php": "^8.3",
     "saloonphp/saloon": "^3.0"
   },
   "require-dev": {

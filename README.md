@@ -9,7 +9,7 @@ A modern PHP SDK for the USA Gymnastics API v4, built with [SaloonPHP](https://d
 
 ## Requirements
 
-- PHP 8.1+
+- PHP 8.3+
 - Composer
 
 ## Installation
