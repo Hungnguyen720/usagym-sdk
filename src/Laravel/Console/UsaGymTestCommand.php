@@ -9,6 +9,9 @@ use AustinW\UsaGym\Exceptions\NotFoundException;
 use AustinW\UsaGym\Exceptions\UsaGymException;
 use AustinW\UsaGym\UsaGym;
 use Illuminate\Console\Command;
+use Saloon\Http\PendingRequest;
+use Saloon\Http\Response;
+use Throwable;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
@@ -27,7 +30,8 @@ class UsaGymTestCommand extends Command
      */
     protected $signature = 'usagym:test
         {--sanction= : Sanction ID for testing sanction-specific endpoints}
-        {--skip-sanction : Skip sanction endpoint tests}';
+        {--skip-sanction : Skip sanction endpoint tests}
+        {--debug : Show request/response headers for debugging}';
 
     /**
      * @var string
@@ -57,6 +61,11 @@ class UsaGymTestCommand extends Command
             username: $credentials['username'],
             password: $credentials['password'],
         );
+
+        // Configure debug middleware if --debug flag is set
+        if ($this->option('debug')) {
+            $this->configureDebugMiddleware($usagym);
+        }
 
         // Test authentication
         if (! $this->testAuthentication($usagym)) {
@@ -265,6 +274,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Club Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch clubs: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Club Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to fetch clubs: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -299,6 +311,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Athlete Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch athletes: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Athlete Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to fetch athletes: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -318,6 +333,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Coach Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch coaches: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Coach Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to fetch coaches: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -337,6 +355,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Judge Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch judges: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Judge Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to fetch judges: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -356,6 +377,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Group Reservations', 'fail', 'Error: '.$e->getMessage());
             error('Failed to fetch groups: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Group Reservations', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to fetch groups: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -397,6 +421,9 @@ class UsaGymTestCommand extends Command
         } catch (UsaGymException $e) {
             $this->recordResult('Athlete Verification', 'fail', 'Error: '.$e->getMessage());
             error('Failed to verify athlete: '.$e->getMessage());
+        } catch (Throwable $e) {
+            $this->recordResult('Athlete Verification', 'fail', 'Error: '.$this->extractErrorMessage($e));
+            error('Failed to verify athlete: '.$this->extractErrorMessage($e));
         }
 
         $this->newLine();
@@ -446,5 +473,73 @@ class UsaGymTestCommand extends Command
     private function hasFailures(): bool
     {
         return count(array_filter($this->results, fn ($r) => $r['status'] === 'fail')) > 0;
+    }
+
+    private function extractErrorMessage(Throwable $e): string
+    {
+        $message = $e->getMessage();
+
+        // Try to get more details from the previous exception
+        if ($e->getPrevious() instanceof \Saloon\Exceptions\Request\RequestException) {
+            $response = $e->getPrevious()->getResponse();
+            $message = "HTTP {$response->status()}: ".$response->body();
+        }
+
+        return $message;
+    }
+
+    private function configureDebugMiddleware(UsaGym $usagym): void
+    {
+        info('Debug mode enabled - showing request/response details');
+        $this->newLine();
+
+        $usagym->middleware()->onRequest(function (PendingRequest $pendingRequest): void {
+            $this->newLine();
+            $this->line('<fg=cyan>>>> REQUEST</>');
+            $this->line("<fg=yellow>{$pendingRequest->getMethod()->value}</> {$pendingRequest->getUrl()}");
+
+            $this->newLine();
+            $this->line('<fg=cyan>Request Headers:</>');
+
+            foreach ($pendingRequest->headers()->all() as $name => $value) {
+                // Mask the Authorization header value for security but show it exists
+                if (strtolower($name) === 'authorization') {
+                    $displayValue = is_array($value) ? $value[0] : $value;
+                    // Show first 20 chars then mask the rest
+                    if (strlen($displayValue) > 20) {
+                        $displayValue = substr($displayValue, 0, 20).'...';
+                    }
+                    $this->line("  {$name}: {$displayValue}");
+                } else {
+                    $displayValue = is_array($value) ? implode(', ', $value) : $value;
+                    $this->line("  {$name}: {$displayValue}");
+                }
+            }
+
+            $this->newLine();
+        });
+
+        $usagym->middleware()->onResponse(function (Response $response): void {
+            $this->line('<fg=cyan><<< RESPONSE</>');
+            $statusColor = $response->successful() ? 'green' : 'red';
+            $this->line("<fg={$statusColor}>HTTP {$response->status()}</>");
+
+            $this->newLine();
+            $this->line('<fg=cyan>Response Headers:</>');
+
+            foreach ($response->headers()->all() as $name => $values) {
+                $displayValue = is_array($values) ? implode(', ', $values) : $values;
+                $this->line("  {$name}: {$displayValue}");
+            }
+
+            $this->newLine();
+            $this->line('<fg=cyan>Response Body (first 500 chars):</>');
+            $body = $response->body();
+            if (strlen($body) > 500) {
+                $body = substr($body, 0, 500).'...';
+            }
+            $this->line($body);
+            $this->newLine();
+        });
     }
 }
