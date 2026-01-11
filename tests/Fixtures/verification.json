@@ -1,0 +1,19 @@
+{
+    "MemberID": "987654",
+    "LastName": "Smith",
+    "FirstName": "Jane",
+    "DOB": "05/15/2010",
+    "USCitizen": "Yes",
+    "ClubID": ["12345"],
+    "ClubAbbrev": ["ABC"],
+    "ClubName": ["ABC Gymnastics"],
+    "ClubStatus": ["ACTIVE"],
+    "InternationalClub": ["No"],
+    "MemberType": "ATHL",
+    "Discipline": ["WAG"],
+    "Level": "WLEVEL04",
+    "InternationalMember": "No",
+    "Eligible": true,
+    "IneligibleReason": null,
+    "Certification": null
+}

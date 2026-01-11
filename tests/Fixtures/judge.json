@@ -1,0 +1,15 @@
+{
+    "MemberID": "666666",
+    "LastName": "Davis",
+    "FirstName": "Judge",
+    "Discipline": "Women",
+    "MemberType": "JUDGE",
+    "InternationalMember": false,
+    "Status": "Active",
+    "RegDate": "2024-01-05T12:00:00",
+    "Level": "National",
+    "Scratched": false,
+    "ScratchDate": null,
+    "ModifiedDate": "2024-01-05T12:00:00",
+    "Certification": ["NAT", "REG"]
+}

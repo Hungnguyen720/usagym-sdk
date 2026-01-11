@@ -1,48 +1,98 @@
 <?php
 
-namespace AustinW\Usagym\Data;
+declare(strict_types=1);
 
-use Spatie\DataTransferObject\FlexibleDataTransferObject;
+namespace AustinW\UsaGym\Data;
 
-class GroupReservation extends FlexibleDataTransferObject
+use AustinW\UsaGym\Enums\Discipline;
+use AustinW\UsaGym\Enums\MemberStatus;
+use DateTimeImmutable;
+
+/**
+ * Group/Pair reservation data from the API
+ */
+final readonly class GroupReservation
 {
-    public string $OrgID;
+    /**
+     * @param array<GroupAthlete> $athletes
+     */
+    public function __construct(
+        public string $orgId,
+        public ?string $clubAbbrev,
+        public string $clubName,
+        public bool $internationalClub,
+        public string $groupId,
+        public string $groupName,
+        public string $groupType,
+        public Discipline $discipline,
+        public MemberStatus $status,
+        public ?DateTimeImmutable $registrationDate,
+        public ?string $apparatus,
+        public string $level,
+        public ?string $ageGroup,
+        public array $athletes,
+        public bool $scratched,
+        public ?DateTimeImmutable $scratchDate,
+        public ?DateTimeImmutable $modifiedDate,
+    ) {}
 
-    public string $ClubAbbrev;
+    /**
+     * @param array<string, mixed> $data
+     */
+    public static function fromArray(array $data): self
+    {
+        $athletes = array_map(
+            fn(array $athlete) => GroupAthlete::fromArray($athlete),
+            $data['Athletes'] ?? []
+        );
 
-    public string $ClubName;
+        return new self(
+            orgId: (string) $data['OrgID'],
+            clubAbbrev: $data['ClubAbbrev'] ?: null,
+            clubName: $data['ClubName'],
+            internationalClub: (bool) ($data['InternationalClub'] ?? false),
+            groupId: (string) $data['GroupID'],
+            groupName: $data['GroupName'],
+            groupType: $data['GroupType'],
+            discipline: Discipline::fromApi($data['Discipline']),
+            status: MemberStatus::from($data['Status']),
+            registrationDate: self::parseDateTime($data['RegDate'] ?? null),
+            apparatus: $data['Apparatus'] ?? null,
+            level: $data['Level'],
+            ageGroup: $data['AgeGroup'] ?? null,
+            athletes: $athletes,
+            scratched: (bool) ($data['Scratched'] ?? false),
+            scratchDate: self::parseDateTime($data['ScratchDate'] ?? null),
+            modifiedDate: self::parseDateTime($data['ModifiedDate'] ?? null),
+        );
+    }
 
-    public string $InternationalClub;
+    /**
+     * Get the number of athletes in the group
+     */
+    public function athleteCount(): int
+    {
+        return count($this->athletes);
+    }
 
-    public string $GroupID;
+    /**
+     * Check if the group can compete
+     */
+    public function canCompete(): bool
+    {
+        return $this->status->canParticipate() && !$this->scratched;
+    }
 
-    public string $GroupName;
+    private static function parseDateTime(?string $value): ?DateTimeImmutable
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
 
-    public string $GroupType;
-
-    public string $Discipline;
-
-    public string $Status;
-
-    public string $RegDate;
-
-    public string $Apparatus;
-
-    public string $Level;
-
-    public string $LevelCode;
-
-    public string $AgeGroup;
-
-    public array $Athletes;
-
-    public int $Scratched;
-
-    public $ScratchDate;
-
-    public string $ModifiedDate;
-
-    public ?string $AthleteID1;
-
-    public ?string $AthleteID2;
+        try {
+            return new DateTimeImmutable($value);
+        } catch (\Exception) {
+            return null;
+        }
+    }
 }

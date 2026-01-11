@@ -10,9 +10,9 @@ use AustinW\UsaGym\Enums\MemberStatus;
 use DateTimeImmutable;
 
 /**
- * Athlete reservation data from the API
+ * Coach reservation data from the API
  */
-final readonly class AthleteReservation
+final readonly class CoachReservation
 {
     public function __construct(
         public string $orgId,
@@ -22,15 +22,11 @@ final readonly class AthleteReservation
         public string $memberId,
         public string $lastName,
         public string $firstName,
-        public ?DateTimeImmutable $dateOfBirth,
         public Discipline $discipline,
         public MemberType $memberType,
         public bool $internationalMember,
         public MemberStatus $status,
         public ?DateTimeImmutable $registrationDate,
-        public ?string $apparatus,
-        public string $level,
-        public ?string $ageGroup,
         public bool $scratched,
         public ?DateTimeImmutable $scratchDate,
         public ?DateTimeImmutable $modifiedDate,
@@ -49,15 +45,11 @@ final readonly class AthleteReservation
             memberId: (string) $data['MemberID'],
             lastName: $data['LastName'],
             firstName: $data['FirstName'],
-            dateOfBirth: self::parseDate($data['DOB'] ?? null, 'm/d/Y'),
             discipline: Discipline::fromApi($data['Discipline']),
             memberType: MemberType::from($data['MemberType']),
             internationalMember: (bool) ($data['InternationalMember'] ?? false),
             status: MemberStatus::from($data['Status']),
             registrationDate: self::parseDateTime($data['RegDate'] ?? null),
-            apparatus: $data['Apparatus'] ?? null,
-            level: $data['Level'],
-            ageGroup: $data['AgeGroup'] ?? null,
             scratched: (bool) ($data['Scratched'] ?? false),
             scratchDate: self::parseDateTime($data['ScratchDate'] ?? null),
             modifiedDate: self::parseDateTime($data['ModifiedDate'] ?? null),
@@ -65,29 +57,11 @@ final readonly class AthleteReservation
     }
 
     /**
-     * Get the full name of the athlete
+     * Get the full name of the coach
      */
     public function fullName(): string
     {
         return "{$this->firstName} {$this->lastName}";
-    }
-
-    /**
-     * Check if the athlete can compete
-     */
-    public function canCompete(): bool
-    {
-        return $this->status->canParticipate() && !$this->scratched;
-    }
-
-    private static function parseDate(?string $value, string $format = 'Y-m-d'): ?DateTimeImmutable
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        $date = DateTimeImmutable::createFromFormat($format, $value);
-        return $date ?: null;
     }
 
     private static function parseDateTime(?string $value): ?DateTimeImmutable

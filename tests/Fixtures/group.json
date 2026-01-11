@@ -1,0 +1,25 @@
+{
+    "OrgID": "12345",
+    "ClubAbbrev": "ABC",
+    "ClubName": "ABC Gymnastics",
+    "InternationalClub": false,
+    "GroupID": "GRP001",
+    "GroupName": "ABC Junior Group",
+    "GroupType": "Group",
+    "Discipline": "Rhythmic",
+    "Status": "Active",
+    "RegDate": "2024-01-20T14:00:00",
+    "Apparatus": "5 Balls",
+    "Level": "Level 7",
+    "AgeGroup": "Junior",
+    "Athletes": [
+        {"MemberID": "111111", "LastName": "Anderson", "FirstName": "Alice"},
+        {"MemberID": "222222", "LastName": "Brown", "FirstName": "Betty"},
+        {"MemberID": "333333", "LastName": "Clark", "FirstName": "Carol"},
+        {"MemberID": "444444", "LastName": "Davis", "FirstName": "Diana"},
+        {"MemberID": "555555", "LastName": "Evans", "FirstName": "Eve"}
+    ],
+    "Scratched": false,
+    "ScratchDate": null,
+    "ModifiedDate": "2024-01-20T14:00:00"
+}

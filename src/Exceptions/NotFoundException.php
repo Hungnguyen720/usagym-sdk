@@ -1,18 +1,27 @@
 <?php
 
-namespace AustinW\Usagym\Exceptions;
+declare(strict_types=1);
 
-use Exception;
+namespace AustinW\UsaGym\Exceptions;
 
-class NotFoundException extends Exception
+use Saloon\Http\Response;
+use Throwable;
+
+/**
+ * Exception thrown when a requested resource is not found (404 responses)
+ */
+class NotFoundException extends UsaGymException
 {
     /**
-     * Create a new exception instance.
-     *
-     * @return void
+     * @param array<string, mixed>|null $data
      */
-    public function __construct()
-    {
-        parent::__construct('The resource you are looking for could not be found.');
+    public function __construct(
+        string $message = 'The resource you are looking for could not be found.',
+        ?Response $response = null,
+        ?array $data = null,
+        int $code = 404,
+        ?Throwable $previous = null,
+    ) {
+        parent::__construct($message, $response, $data, $code, $previous);
     }
 }

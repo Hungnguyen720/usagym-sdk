@@ -1,37 +1,63 @@
 <?php
 
-namespace AustinW\Usagym\Exceptions;
+declare(strict_types=1);
 
-use Exception;
+namespace AustinW\UsaGym\Exceptions;
 
-class ValidationException extends Exception
+use Saloon\Http\Response;
+use Throwable;
+
+/**
+ * Exception thrown when API validation fails (422 responses)
+ */
+class ValidationException extends UsaGymException
 {
     /**
-     * The array of errors.
-     *
-     * @var array
+     * @var array<string, array<string>>
      */
-    public $errors;
+    protected readonly array $errors;
 
     /**
-     * Create a new exception instance.
-     *
-     * @return void
+     * @param array<string, mixed>|null $data
      */
-    public function __construct(array $errors)
-    {
-        parent::__construct('The given data failed to pass validation.');
+    public function __construct(
+        string $message,
+        ?Response $response = null,
+        ?array $data = null,
+        int $code = 422,
+        ?Throwable $previous = null,
+    ) {
+        parent::__construct($message, $response, $data, $code, $previous);
 
-        $this->errors = $errors;
+        // Extract errors from response data
+        $this->errors = $data['errors'] ?? $data['data']['errors'] ?? [];
     }
 
     /**
-     * The array of errors.
+     * Get the validation errors
      *
-     * @return array
+     * @return array<string, array<string>>
      */
-    public function errors()
+    public function errors(): array
     {
         return $this->errors;
+    }
+
+    /**
+     * Check if a specific field has errors
+     */
+    public function hasError(string $field): bool
+    {
+        return isset($this->errors[$field]);
+    }
+
+    /**
+     * Get errors for a specific field
+     *
+     * @return array<string>
+     */
+    public function getFieldErrors(string $field): array
+    {
+        return $this->errors[$field] ?? [];
     }
 }

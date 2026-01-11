@@ -1,0 +1,21 @@
+{
+    "OrgID": "12345",
+    "ClubAbbrev": "ABC",
+    "ClubName": "ABC Gymnastics",
+    "InternationalClub": false,
+    "MemberID": "987654",
+    "LastName": "Smith",
+    "FirstName": "Jane",
+    "DOB": "05/15/2010",
+    "Discipline": "Women",
+    "MemberType": "ATHL",
+    "InternationalMember": false,
+    "Status": "Active",
+    "RegDate": "2024-01-15T10:30:00",
+    "Apparatus": null,
+    "Level": "WLEVEL04",
+    "AgeGroup": "Junior",
+    "Scratched": false,
+    "ScratchDate": null,
+    "ModifiedDate": "2024-01-15T10:30:00"
+}

@@ -1,36 +1,71 @@
 <?php
 
-namespace AustinW\Usagym\Data;
+declare(strict_types=1);
 
-use Spatie\DataTransferObject\FlexibleDataTransferObject;
+namespace AustinW\UsaGym\Data;
 
-class ClubReservation extends FlexibleDataTransferObject
+/**
+ * Club reservation data from the API
+ */
+final readonly class ClubReservation
 {
-    public string $ClubID;
+    public function __construct(
+        public string $clubId,
+        public ?string $clubAbbrev,
+        public string $clubName,
+        public ?string $clubCity,
+        public ?string $clubState,
+        public ?string $clubContactId,
+        public ?string $clubContactName,
+        public ?string $clubContactEmail,
+        public ?string $clubContactPhone,
+        public ?string $meetContactId,
+        public ?string $meetContactName,
+        public ?string $meetContactEmail,
+        public ?string $meetContactPhone,
+        public bool $internationalClub,
+    ) {}
 
-    public string $ClubAbbrev;
+    /**
+     * @param array<string, mixed> $data
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            clubId: (string) $data['ClubID'],
+            clubAbbrev: ($data['ClubAbbrev'] ?? null) ?: null,
+            clubName: $data['ClubName'],
+            clubCity: ($data['ClubCity'] ?? null) ?: null,
+            clubState: ($data['ClubState'] ?? null) ?: null,
+            clubContactId: ($data['ClubContactID'] ?? null) ?: null,
+            clubContactName: $data['ClubContactName'] ?? $data['ClubContact'] ?? null,
+            clubContactEmail: ($data['ClubContactEmail'] ?? null) ?: null,
+            clubContactPhone: ($data['ClubContactPhone'] ?? null) ?: null,
+            meetContactId: ($data['MeetContactID'] ?? null) ?: null,
+            meetContactName: ($data['MeetContactName'] ?? null) ?: null,
+            meetContactEmail: ($data['MeetContactEmail'] ?? null) ?: null,
+            meetContactPhone: ($data['MeetContactPhone'] ?? null) ?: null,
+            internationalClub: (bool) ($data['InternationalClub'] ?? false),
+        );
+    }
 
-    public string $ClubName;
+    /**
+     * Get the display name for the club
+     */
+    public function displayName(): string
+    {
+        return $this->clubAbbrev ?? $this->clubName;
+    }
 
-    public string $ClubCity;
+    /**
+     * Get the full location string
+     */
+    public function location(): ?string
+    {
+        if ($this->clubCity && $this->clubState) {
+            return "{$this->clubCity}, {$this->clubState}";
+        }
 
-    public string $ClubState;
-
-    public ?string $ClubContactID;
-
-    public string $ClubContactName;
-
-    public string $ClubContactEmail;
-
-    public ?string $ClubContactPhone;
-
-    public string $MeetContactID;
-
-    public ?string $MeetContactName;
-
-    public string $MeetContactEmail;
-
-    public ?string $MeetContactPhone;
-
-    public string $InternationalClub;
+        return $this->clubCity ?? $this->clubState;
+    }
 }

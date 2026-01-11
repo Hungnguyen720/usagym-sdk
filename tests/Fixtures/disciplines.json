@@ -1,0 +1,8 @@
+[
+    {"Code": "WAG", "Name": "Women", "FullName": "Women's Artistic"},
+    {"Code": "MAG", "Name": "Men", "FullName": "Men's Artistic"},
+    {"Code": "RG", "Name": "Rhythmic", "FullName": "Rhythmic"},
+    {"Code": "ACRO", "Name": "Acro", "FullName": "Acrobatic"},
+    {"Code": "TRA", "Name": "TT", "FullName": "Trampoline and Tumbling"},
+    {"Code": "GFA", "Name": "GFA", "FullName": "Gymnastics for All"}
+]

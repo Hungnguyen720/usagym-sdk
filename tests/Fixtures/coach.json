@@ -1,0 +1,17 @@
+{
+    "OrgID": "12345",
+    "ClubAbbrev": "ABC",
+    "ClubName": "ABC Gymnastics",
+    "InternationalClub": false,
+    "MemberID": "555555",
+    "LastName": "Williams",
+    "FirstName": "Coach",
+    "Discipline": "Women",
+    "MemberType": "CCOACH",
+    "InternationalMember": false,
+    "Status": "Active",
+    "RegDate": "2024-01-10T08:00:00",
+    "Scratched": false,
+    "ScratchDate": null,
+    "ModifiedDate": "2024-01-10T08:00:00"
+}

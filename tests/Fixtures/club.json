@@ -1,0 +1,16 @@
+{
+    "ClubID": "12345",
+    "ClubAbbrev": "ABC",
+    "ClubName": "ABC Gymnastics",
+    "ClubCity": "Los Angeles",
+    "ClubState": "CA",
+    "ClubContactID": "111",
+    "ClubContactName": "John Manager",
+    "ClubContactEmail": "manager@abcgym.com",
+    "ClubContactPhone": "555-123-4567",
+    "MeetContactID": "222",
+    "MeetContactName": "Sarah Coordinator",
+    "MeetContactEmail": "meets@abcgym.com",
+    "MeetContactPhone": "555-987-6543",
+    "InternationalClub": false
+}
