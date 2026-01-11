@@ -1,5 +1,10 @@
 # USA Gymnastics SDK
 
+[![Tests](https://github.com/AustinW/usagym-sdk/actions/workflows/tests.yml/badge.svg)](https://github.com/AustinW/usagym-sdk/actions/workflows/tests.yml)
+[![Latest Version](https://img.shields.io/packagist/v/austinw/usagym-sdk.svg)](https://packagist.org/packages/austinw/usagym-sdk)
+[![PHP Version](https://img.shields.io/packagist/php-v/austinw/usagym-sdk.svg)](https://packagist.org/packages/austinw/usagym-sdk)
+[![License](https://img.shields.io/packagist/l/austinw/usagym-sdk.svg)](https://packagist.org/packages/austinw/usagym-sdk)
+
 A modern PHP SDK for the USA Gymnastics API v4, built with [SaloonPHP](https://docs.saloon.dev/).
 
 ## Requirements
